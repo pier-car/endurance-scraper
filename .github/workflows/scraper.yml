@@ -1,0 +1,62 @@
+name: Endurance Scraper
+
+on:
+  # Esecuzione settimanale: ogni lunedì alle 04:17 UTC (orario "tranquillo").
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      max_iterations:
+        description: "Numero massimo di iterazioni FASE 2 (pedigree ricorsivo)"
+        required: false
+        default: "50"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: endurance-scraper
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    name: Run 3-phase pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 350  # poco sotto il limite GitHub Actions (6h)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Phase 1 — Seed horse IDs
+        run: python -m scraper.seed_ids --db endurance_data.db -v
+
+      - name: Phase 2 — Extract pedigree (recursive)
+        run: |
+          python -m scraper.extract_pedigree \
+            --db endurance_data.db \
+            --max-iterations "${{ github.event.inputs.max_iterations || '50' }}" \
+            -v
+
+      - name: Phase 3 — Extract performance
+        run: python -m scraper.extract_performance --db endurance_data.db -v
+
+      - name: Upload SQLite database artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: endurance_data
+          path: endurance_data.db
+          retention-days: 90
+          if-no-files-found: warn
