@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# SQLite databases (output dello scraper)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Output dello scraper legacy
+data/
+
+# IDE
+.vscode/
+.idea/

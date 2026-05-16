@@ -123,7 +123,7 @@ def parse_results(html: str) -> list[dict]:
             cells = tr.find_all(["td", "th"])
             if not cells:
                 continue
-            row: dict[str, str | None] = {
+            row: dict[str, str | float | None] = {
                 "data_gara": None, "gara": None, "distanza_km": None,
                 "velocita_kmh": None, "posizione": None, "stato_raw": None,
             }

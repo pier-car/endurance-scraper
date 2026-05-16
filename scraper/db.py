@@ -125,10 +125,14 @@ def fetch_pending(
     limit: int | None = None,
 ) -> list[sqlite3.Row]:
     """Ritorna le righe in stato PENDING (opzionalmente limitate)."""
-    sql = "SELECT horse_id, id_type FROM coda_cavalli WHERE status = 'PENDING'"
-    if limit is not None:
-        sql += f" LIMIT {int(limit)}"
-    return conn.execute(sql).fetchall()
+    if limit is None:
+        return conn.execute(
+            "SELECT horse_id, id_type FROM coda_cavalli WHERE status = 'PENDING'"
+        ).fetchall()
+    return conn.execute(
+        "SELECT horse_id, id_type FROM coda_cavalli WHERE status = 'PENDING' LIMIT ?",
+        (int(limit),),
+    ).fetchall()
 
 
 def mark_status(
