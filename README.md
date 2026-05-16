@@ -141,4 +141,7 @@ evita esecuzioni sovrapposte.
 - `.github/workflows/scraper.yml` — automazione GitHub Actions
 - `requirements.txt` — dipendenze Python
 - `endurance_scraper.ipynb` — notebook legacy (mantenuto a scopo storico,
-  superato dalla pipeline a ID)
+  superato dalla pipeline a ID). Allineato alla mappa completa dei 55
+  endpoint reali: importa `ENDPOINTS` da `scraper.endpoints` quando il
+  pacchetto è disponibile, con fallback hardcoded equivalente per
+  l'esecuzione su Colab senza il repo installato.
